@@ -1,0 +1,131 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html;charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>WebSocket Examples: Reverse</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script th:src="@{/layui/layui.js}"></script>
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <style type="text/css">
+        #connect-container {
+            margin: 0 auto;
+            width: 400px;
+        }
+
+        #connect-container div {
+            padding: 5px;
+            margin: 0 7px 10px 0;
+        }
+
+        .layui-btn {
+            display: inline-block;
+        }
+    </style>
+    <script type="text/javascript">
+        var ws = null;
+
+        $(function () {
+            var target = $("#target");
+            if (window.location.protocol === 'http:') {
+                target.val('http://' + window.location.host + target.val());
+            } else {
+                target.val('https://' + window.location.host + target.val());
+            }
+        });
+
+        function setConnected(connected) {
+            var connect = $("#connect");
+            var disconnect = $("#disconnect");
+            var echo = $("#echo");
+
+            if (connected) {
+                connect.addClass("layui-btn-disabled");
+                disconnect.removeClass("layui-btn-disabled");
+                echo.removeClass("layui-btn-disabled");
+            } else {
+                connect.removeClass("layui-btn-disabled");
+                disconnect.addClass("layui-btn-disabled");
+                echo.addClass("layui-btn-disabled");
+            }
+
+            connect.attr("disabled", connected);
+            disconnect.attr("disabled", !connected);
+            echo.attr("disabled", !connected);
+        }
+
+        //连接
+        function connect() {
+            var target = $("#target").val();
+
+            ws = new SockJS(target);
+            ws.onopen = function () {
+                setConnected(true);
+                log('Info: WebSocket connection opened.');
+            };
+            ws.onmessage = function (event) {
+                log('Received: ' + event.data);
+            };
+            ws.onclose = function () {
+                setConnected(false);
+                log('Info: WebSocket connection closed.');
+            };
+        }
+
+        //断开连接
+        function disconnect() {
+            if (ws != null) {
+                ws.close();
+                ws = null;
+            }
+            setConnected(false);
+        }
+
+        //Echo
+        function echo() {
+            if (ws != null) {
+                var message = $("#message").val();
+                log('Sent: ' + message);
+                ws.send(message);
+            } else {
+                alert('WebSocket connection not established, please connect.');
+            }
+        }
+
+        //日志输出
+        function log(message) {
+            console.debug(message);
+        }
+    </script>
+</head>
+<body>
+    <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websockets rely on Javascript being
+        enabled. Please enable
+        Javascript and reload this page!</h2></noscript>
+    <div>
+        <div id="connect-container" class="layui-elem-field">
+            <legend>Echo With SockJS</legend>
+            <div>
+                <input id="target" type="text" class="layui-input" size="40" style="width: 350px" value="/echoMessage_SockJS"/>
+            </div>
+            <div>
+                <button id="connect" class="layui-btn layui-btn-normal" onclick="connect();">Connect</button>
+                <button id="disconnect" class="layui-btn layui-btn-normal layui-btn-disabled" disabled="disabled"
+                        onclick="disconnect();">Disconnect
+                </button>
+
+            </div>
+            <div>
+                <textarea id="message" class="layui-textarea" placeholder="请输入请求的内容" style="width: 350px"></textarea>
+            </div>
+            <div>
+                <button id="echo" class="layui-btn layui-btn-normal layui-btn-disabled" disabled="disabled"
+                        onclick="echo();">Echo message
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
