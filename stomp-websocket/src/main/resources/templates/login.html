@@ -1,17 +1,43 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta content="text/html;charset=UTF-8"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>SSO单点登录</title>
-    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
-    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <title>登录页面</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script th:src="@{/layui/layui.js}"></script>
+    <script th:src="@{/layui/lay/modules/layer.js}"></script>
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <link th:href="@{/layui/css/modules/layer/default/layer.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body onkeydown="enterlogin(event);">
 
-    <script>
+    <div class="login-main">
+        <header class="layui-elip">登录</header>
+
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="username"></label>
+                <input type="text" name="username" id="username" placeholder="用户名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="password"></label>
+                <input type="password" name="password" id="password" placeholder="密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" onclick="userLogin()">登 入</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script type="text/javascript">
         //回车登录
         function enterlogin(e) {
             var key = window.event ? e.keyCode : e.which;
@@ -27,13 +53,17 @@
             var password = $("#password").val();
 
             if (username == null || username === "") {
-                $("#errMsg").text("请输入登陆用户名！");
-                $("#errMsg").attr("style", "display:block");
+                layer.msg('请输入登陆用户名！', {
+                    offset: '15px'
+                    ,icon: 1
+                });
                 return;
             }
             if (password == null || password === "") {
-                $("#errMsg").text("请输入登陆密码！");
-                $("#errMsg").attr("style", "display:block");
+                layer.msg('请输入登陆密码！', {
+                    offset: '15px'
+                    ,icon: 1
+                });
                 return;
             }
 
@@ -47,52 +77,33 @@
                     "password": password
                 },
                 success: function (data) {
-                    if (data.code == "200") {
-                        $("#errMsg").attr("style", "display:none");
-
+                    if (data.code !=null && data.code == "200") {
+                        var href = '/user/userIndex';
                         if (data.redirect_uri != null){
-                            window.location.href = data.redirect_uri;
-                        }else{
-                            window.location.href = '/user/userIndex';
+                            href = data.redirect_uri;
                         }
+                        //登入成功的提示与跳转
+                        layer.msg('登入成功', {
+                            offset: '15px'
+                            ,icon: 1
+                            ,time: 1000
+                        }, function(){
+                            window.location.href = decodeURIComponent(href);
+                        });
                     } else if (data.result != null) {
-                        $("#errMsg").text(data.result);
-                        $("#errMsg").attr("style", "display:block");
+                        layer.msg(data.result, {
+                            offset: '15px'
+                            ,icon: 1
+                        });
                     } else {
-                        $("#errMsg").text(data.msg);
-                        $("#errMsg").attr("style", "display:block");
+                        layer.msg(data.msg, {
+                            offset: '15px'
+                            ,icon: 1
+                        });
                     }
                 }
             });
         }
     </script>
-</head>
-<body onkeydown="enterlogin(event);">
-<div class="container">
-    <div class="form row">
-        <div class="form-horizontal col-md-offset-3" id="login_form">
-            <h3 class="form-title">SSO单点登录</h3>
-            <div class="col-md-9">
-                <div class="form-group">
-                    <i class="fa fa-user fa-lg"></i>
-                    <input class="form-control required" type="text" placeholder="Username" id="username"
-                           name="username" autofocus="autofocus" maxlength="20"/>
-                </div>
-                <div class="form-group">
-                    <i class="fa fa-lock fa-lg"></i>
-                    <input class="form-control required" type="password" placeholder="Password" id="password"
-                           name="password" maxlength="8"/>
-                </div>
-                <div class="form-group">
-                    <span class="errMsg" id="errMsg" style="display: none">错误提示</span>
-                </div>
-                <div class="form-group col-md-offset-9">
-                    <button type="submit" class="btn btn-success pull-right" name="submit" onclick="userLogin()">登录
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>

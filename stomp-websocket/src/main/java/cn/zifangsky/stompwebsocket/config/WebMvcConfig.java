@@ -21,6 +21,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/index").setViewName("index");
+		registry.addViewController("/stomp").setViewName("websocket/stomp");
+        registry.addViewController("/chat").setViewName("websocket/chat");
 	}
 
 	/**
@@ -28,7 +30,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/user/**");
+		registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/user/**","/chat");
 	}
 
 }

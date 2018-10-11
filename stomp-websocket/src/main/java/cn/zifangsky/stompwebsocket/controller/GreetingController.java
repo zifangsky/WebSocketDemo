@@ -5,8 +5,6 @@ import cn.zifangsky.stompwebsocket.model.websocket.HelloMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Greeting
@@ -16,11 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class GreetingController {
-
-    @RequestMapping("/stomp")
-    public ModelAndView stomp(){
-        return new ModelAndView("websocket/stomp");
-    }
 
     @MessageMapping("/hello")
     @SendTo("/topic/greeting")

@@ -1,6 +1,9 @@
 package cn.zifangsky.stompwebsocket.config;
 
-import cn.zifangsky.stompwebsocket.interceptor.MyChannelInterceptor;
+import cn.zifangsky.stompwebsocket.interceptor.websocket.AuthHandshakeInterceptor;
+import cn.zifangsky.stompwebsocket.interceptor.websocket.MyChannelInterceptor;
+import cn.zifangsky.stompwebsocket.interceptor.websocket.MyHandshakeHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,10 +21,23 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
+    @Autowired
+    private AuthHandshakeInterceptor authHandshakeInterceptor;
+
+    @Autowired
+    private MyHandshakeHandler myHandshakeHandler;
+
+    @Autowired
+    private MyChannelInterceptor myChannelInterceptor;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/stomp-websocket").withSockJS();
+
+        registry.addEndpoint("/chat-websocket")
+                .addInterceptors(authHandshakeInterceptor)
+                .setHandshakeHandler(myHandshakeHandler)
+                .withSockJS();
     }
 
     @Override
@@ -34,6 +50,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new MyChannelInterceptor());
+        registration.interceptors(myChannelInterceptor);
     }
+
 }
