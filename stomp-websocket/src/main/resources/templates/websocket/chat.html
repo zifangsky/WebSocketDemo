@@ -43,11 +43,6 @@
             } else {
                 target.val('https://' + window.location.host + target.val());
             }
-
-            //进入页面后，主动拉取未读消息
-            pullUnreadMessage("/topic/reply");
-
-
         });
 
         function setConnected(connected) {
@@ -80,6 +75,9 @@
             stompClient.connect({}, function () {
                 setConnected(true);
                 log('Info: STOMP connection opened.');
+
+                //连接成功后，主动拉取未读消息
+                pullUnreadMessage("/topic/reply");
 
                 //订阅服务端的/topic/reply地址
                 stompClient.subscribe("/user/topic/reply", function (response) {
@@ -143,7 +141,7 @@
                 success: function (data) {
                     if (data.result != null) {
                         $.each(data.result, function (i, item) {
-                            log(/*JSON.parse(response.body).content*/item);
+                            log(item);
                         })
                     } else if (data.code !=null && data.code == "500") {
                         layer.msg(data.msg, {
