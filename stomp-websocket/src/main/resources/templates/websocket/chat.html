@@ -141,7 +141,7 @@
                 success: function (data) {
                     if (data.result != null) {
                         $.each(data.result, function (i, item) {
-                            log(item);
+                            log(JSON.parse(item).content);
                         })
                     } else if (data.code !=null && data.code == "500") {
                         layer.msg(data.msg, {
