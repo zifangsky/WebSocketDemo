@@ -7,7 +7,7 @@
     <groupId>cn.zifangsky</groupId>
     <artifactId>WebSocketDemo</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>WebSocketDemo</name>
     <description>Demo project for Spring Boot</description>
@@ -22,6 +22,7 @@
     <modules>
         <module>sample-websocket</module>
         <module>stomp-websocket</module>
+        <module>mq-websocket</module>
     </modules>
 
     <properties>
