@@ -67,7 +67,7 @@ public class RedisMessageController {
         User loginUser = (User) session.getAttribute(Constants.SESSION_USER);
 
         HelloMessage resultData = new HelloMessage(MessageFormat.format("{0} say: {1}", loginUser.getUsername(), msg));
-        this.sendToUser(loginUser.getUsername(), receiver, "/topic/reply", JsonUtils.toJson(resultData));
+        this.sendToUser(loginUser.getUsername(), receiver, WebSocketChannelEnum.CHAT.getSubscribeUrl(), JsonUtils.toJson(resultData));
 
         return "ok";
     }
